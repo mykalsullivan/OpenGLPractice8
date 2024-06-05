@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.28)
-project(OpenGLPractice7)
+project(OpenGLPractice8)
 
 set(CMAKE_CXX_STANDARD 23)
 
@@ -14,14 +14,14 @@ include_directories(
         ${GLM_INCLUDE_DIRS}
 )
 
-add_executable(OpenGLPractice7
+add_executable(OpenGLPractice8
         src/main.cpp
         src/window.cpp
         src/mesh.cpp
         src/shader.cpp
 )
 
-target_link_libraries(OpenGLPractice7
+target_link_libraries(OpenGLPractice8
         glfw
         ${OPENGL_LIBRARIES}
         ${GLEW_LIBRARIES}

@@ -27,8 +27,8 @@ namespace
     std::vector<std::shared_ptr<Shader>> shaders;
 
     // Shader stuff
-    const char* vertexShader = "/home/msullivan/Projects/CLion/OpenGLPractice7/src/Shaders/shader.vert";
-    const char* fragmentShader = "/home/msullivan/Projects/CLion/OpenGLPractice7/src/Shaders/shader.frag";
+    const char* vertexShader = "/home/msullivan/Projects/CLion/OpenGLPractice8/src/Shaders/shader.vert";
+    const char* fragmentShader = "/home/msullivan/Projects/CLion/OpenGLPractice8/src/Shaders/shader.frag";
 }
 
 // Uniform variables
