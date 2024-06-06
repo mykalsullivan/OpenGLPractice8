@@ -91,16 +91,10 @@ int main()
         return 1;
     }
 
-    // Used to prevent sides from being rendered incorrectly
-    glEnable(GL_DEPTH_TEST);
-
-    // Setup viewport size
-    glViewport(0, 0, window.getBufferWidth(), window.getBufferHeight());
-
     createObjects();
     createShaders();
 
-    glm::mat4 projection = glm::perspective(45.0f, window.getBufferHeight()/window.getBufferWidth(), 0.1f, 300.0f);
+    glm::mat4 projection = glm::perspective(45.0f, (float) window.getBufferHeight()/(float) window.getBufferWidth(), 0.1f, 300.0f);
     glm::mat4 model(1.0f);
 
     model = glm::scale(model, glm::vec3(3.0f, 3.0f, 3.0f));
