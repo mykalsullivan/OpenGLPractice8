@@ -4,11 +4,7 @@
 
 #include <iostream>
 #include <memory>
-#include <complex>
 #include <vector>
-#include <cstring>
-#include <thread>
-#include <random>
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
@@ -19,22 +15,22 @@
 #include "window.h"
 #include "mesh.h"
 #include "shader.h"
+#include "camera.h"
 
 namespace
 {
-    unsigned int uniformProjection = 0, uniformModel = 0;
+    // Shader stuff
+    const char* vertexShader = "/home/msullivan/Projects/CLionProjects/OpenGLPractice8/src/Shaders/shader.vert";
+    const char* fragmentShader = "/home/msullivan/Projects/CLionProjects/OpenGLPractice8/src/Shaders/shader.frag";
+
+    unsigned int uniformProjection = 0, uniformModel = 0, uniformView = 0;
     std::vector<std::shared_ptr<Mesh>> meshes;
     std::vector<std::shared_ptr<Shader>> shaders;
+    Camera camera(glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), -90.0f, 0.0f, 10.0f, 0.5f);
 
-    // Shader stuff
-    const char* vertexShader = "/home/msullivan/Projects/CLion/OpenGLPractice8/src/Shaders/shader.vert";
-    const char* fragmentShader = "/home/msullivan/Projects/CLion/OpenGLPractice8/src/Shaders/shader.frag";
+    float deltaTime = 0.0f;
+    float lastTime = 0.0f;
 }
-
-// Uniform variables
-bool direction = true;
-float triOffset = 0.0f, triMaxOffset = 1.0f, triTranslationIncrement = 0.015f;
-float currentAngle = 0.0f;
 
 void createObjects()
 {
@@ -84,9 +80,9 @@ int main()
     glewExperimental = true;
 
     // Setup GLEW
-    if (glewInit() == GLEW_OK)
+    if (glewInit() != GLEW_OK)
     {
-        std::cout << "Could not initialize GLEW\n";
+        std::cout << "GLEW failed to initialize\n";
         glfwTerminate();
         return 1;
     }
@@ -94,71 +90,44 @@ int main()
     createObjects();
     createShaders();
 
-    glm::mat4 projection = glm::perspective(45.0f, (float) window.getBufferHeight()/(float) window.getBufferWidth(), 0.1f, 300.0f);
+    glm::mat4 projection = glm::perspective(45.0f, 16.0f/9.0f, 0.1f, 100.0f);
     glm::mat4 model(1.0f);
 
-    model = glm::scale(model, glm::vec3(3.0f, 3.0f, 3.0f));
-    model = glm::translate(model, glm::vec3(-3.0f, 0.0f, -10.0f));
+    model = glm::scale(model, glm::vec3(7.0f, 7.0f, 7.0f));
+    model = glm::translate(model, glm::vec3(0.0f, 0.0f, -5.0f));
 
 
     // Main loop
     while (!window.shouldClose())
     {
+        // Used to keep framerate consistent
+        auto now = (float) glfwGetTime();   // SDL_GetPerformanceCounter();
+        deltaTime = now - lastTime;         // (now - lastTime) * 1000/SDL_GetPerformanceFrequency();
+        lastTime = now;
+
         // Get/handle user input
         glfwPollEvents();
 
-        {
-            static float i = 0;
+        // Control camera
+        camera.keyControl(window.getKeys(), deltaTime);
+        camera.mouseControl(window.getChangeX(), window.getChangeY());
 
-//            // Rotates between "hard" RGB values
-//            auto r = (float) std::sin(i+(2*M_PI/3));
-//            auto g = (float) std::sin(i);
-//            auto b = (float) std::sin(i-(2*M_PI/3));
+        // Clear window
+        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-            // Rotates between RGB values, but with a LOT of color blending
-            auto r = (float) std::abs(std::sin(i+(2*M_PI/3)));
-            auto g = (float) std::abs(std::sin(i));
-            auto b = (float) std::abs(std::sin(i-(2*M_PI/3)));
+        shaders[0]->use();
+        uniformProjection = shaders[0]->getProjectionLocation();
+        uniformModel = shaders[0]->getModelLocation();
+        uniformView = shaders[0]->getViewLocation();
 
-            if (direction)
-            {
-                triOffset += triTranslationIncrement;
-            }
-            else
-            {
-                triOffset -= triTranslationIncrement;
-            }
+        glUniformMatrix4fv((int) uniformModel, 1, false, glm::value_ptr(model));
+        glUniformMatrix4fv((int) uniformProjection, 1, false, glm::value_ptr(projection));
+        glUniformMatrix4fv((int) uniformView, 1, false, glm::value_ptr(camera.calculateViewMatrix()));
 
-            if (std::abs(triOffset) >= triMaxOffset)
-            {
-                direction = !direction;
-            }
+        for (const auto& mesh : meshes) mesh->render();
 
-            if (currentAngle >= 360)
-            {
-                currentAngle -= 360;
-            }
-
-            // Clear window
-            glClearColor(r, g, b, 1.0f);
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-            shaders[0]->use();
-            uniformProjection = shaders[0]->getProjectionLocation();
-            uniformModel = shaders[0]->getModelLocation();
-
-            model = glm::translate(model, glm::vec3(triOffset/10, 0.0f, -0.0f));
-            glUniformMatrix4fv((int) uniformModel, 1, false, glm::value_ptr(model));
-            glUniformMatrix4fv((int) uniformProjection, 1, false, glm::value_ptr(projection));
-
-            for (const auto& mesh : meshes) mesh->render();
-
-            glUseProgram(0);
-
-            std::this_thread::sleep_for(std::chrono::microseconds(16667));
-            i += 0.015f;
-            currentAngle += 0.05f;
-        }
+        glUseProgram(0);
 
         // Swap display buffers
         window.swapBuffers();

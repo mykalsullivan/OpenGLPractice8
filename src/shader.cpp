@@ -54,6 +54,7 @@ void Shader::compile(const char* vertexSource, const char* fragmentSource)
     // Set uniform location IDs
     m_UniformProjection = glGetUniformLocation(m_ID, "projection");
     m_UniformModel = glGetUniformLocation(m_ID, "model");
+    m_UniformView = glGetUniformLocation(m_ID, "view");
 }
 
 void Shader::add(unsigned int program, const char* source, GLenum type)

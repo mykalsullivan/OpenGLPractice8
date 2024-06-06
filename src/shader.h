@@ -12,7 +12,7 @@ public:
     Shader() = default;
     ~Shader() = default;
 private:
-    unsigned int m_ID, m_UniformProjection, m_UniformModel;
+    unsigned int m_ID, m_UniformProjection, m_UniformModel, m_UniformView;
 private:
     void compile(const char* vertexSource, const char* fragmentSource);
     static void add(unsigned int program, const char* shaderSource, GLenum shaderType);
@@ -22,6 +22,7 @@ public:
     void createFromFiles(const char* vertexSourceFile, const char* fragmentSourceFile);
     constexpr unsigned int getProjectionLocation() const { return m_UniformProjection; }
     constexpr unsigned int getModelLocation() const { return m_UniformModel; }
+    constexpr unsigned int getViewLocation() const { return m_UniformView; }
     void use();
     void clear();
 };

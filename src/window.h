@@ -18,12 +18,15 @@ private:
 
     bool m_Keys[1024];
 
-    float m_LastX, m_LastY;
-    float m_ChangeX, m_ChangeY;
+    float m_LastX = 0.0f, m_LastY = 0.0f;
+    float m_ChangeX = 0.0f, m_ChangeY = 0.0f;
     bool m_MouseFirstMoved = true;
 public:
     constexpr int getBufferWidth() const { return m_BufferWidth; }
     constexpr int getBufferHeight() const { return m_BufferHeight; }
+    bool* getKeys() { return m_Keys; }
+    float getChangeX();
+    float getChangeY();
 
     int init();
     bool shouldClose() { return glfwWindowShouldClose(m_Window); }

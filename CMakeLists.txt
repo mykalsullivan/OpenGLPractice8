@@ -19,6 +19,7 @@ add_executable(OpenGLPractice8
         src/window.cpp
         src/mesh.cpp
         src/shader.cpp
+        src/camera.cpp
 )
 
 target_link_libraries(OpenGLPractice8

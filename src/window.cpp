@@ -61,6 +61,20 @@ int GLWindow::init()
     return 0;
 }
 
+float GLWindow::getChangeX()
+{
+    float change = m_ChangeX;
+    m_ChangeX = 0.0f;
+    return change;
+}
+
+float GLWindow::getChangeY()
+{
+    float change = m_ChangeY;
+    m_ChangeY = 0.0f;
+    return change;
+}
+
 void GLWindow::createCallbacks()
 {
     glfwSetKeyCallback(m_Window, handleKeys);
